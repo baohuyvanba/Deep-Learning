@@ -1,4 +1,4 @@
-> [!NOTE] Nội dung
+> [!NOTE]
 > - Sự khác biệt giữa mô hình tạo sinh (Generative) và mô hình phân biệt (Discriminative).
 > - Xác định các vấn đề mà GAN có thể giải quyết.
 > - Tìm hiểu vai trò của trình Generator và trình phân biệt trong hệ thống GAN.
@@ -199,7 +199,9 @@ class Discriminator(nn.Module):
 - Dù vậy, $\mathcal{G}$ chỉ có thể điều chỉnh một phần của phép đo này, đó là phần liên quan đến dữ liệu giả. Vì vậy, khi huấn luyện ta loại bỏ phần liên quan đến dữ liệu thật.
 - Mặc dù cuối cùng cả hai hàm mất mát trông có vẻ khác nhau, nhưng cả hai đều cùng xuất phát từ một công thức.
 ### 5.1 Minimax Loss
-- Được đề cập trong bài báo GANs, $\mathcal{G}$ sẽ tối thiểu hóa trong khi $\mathcal{D}$ tối đa hóa hàm mất mát sau: $$E_x[\log(\textcolor{red}{\mathcal{D}}(x))] + E_z[\log(1 - \textcolor{red}{\mathcal{D}}(\textcolor{green}{\mathcal{G}}(z)))]$$trong đó:
+- Được đề cập trong bài báo GANs, $\mathcal{G}$ sẽ tối thiểu hóa trong khi $\mathcal{D}$ tối đa hóa hàm mất mát sau:
+$$E_x[\log(\textcolor{red}{\mathcal{D}}(x))] + E_z[\log(1 - \textcolor{red}{\mathcal{D}}(\textcolor{green}{\mathcal{G}}(z)))]$$
+- TTrong đó:
 	- $\textcolor{red}{\mathcal{D}}(x)$ xác suất đầu ra của $\mathcal{D}$ cho dữ liệu thực $x$ là thực.
 	- $E_x$ là giá trị mong muốn trên toàn bộ dữ liệu thực.
 	- $\textcolor{green}{\mathcal{G}}(z)$ đầu ra của $\mathcal{G}$ với nhiễu đầu vào $z$ $\to$ $\textcolor{red}{\mathcal{D}}(\textcolor{green}{\mathcal{G}}(z)))$ xác suất là dữ liệu thực của đầu ra $\mathcal{G}$ tạo ra bởi $\mathcal{D}$.
@@ -208,7 +210,7 @@ class Discriminator(nn.Module):
 - $\mathcal{G}$ đương nhiên không thể tác động tới $E_x[\log(\textcolor{red}{\mathcal{D}}(x))]$ $\to$ việc tối thiểu hóa mất mát tương đương tối thiểu hóa biểu thức: $E_z[\log(1 - \textcolor{red}{\mathcal{D}}(\textcolor{green}{\mathcal{G}}(z)))]$
 - Công thức bắt nguồn từ giá trị Cross-Entropy từ phân phối dữ liệu thực và dữ liệu giả được tạo ra.
 
-> [!NOTE] Cross-Entropy
+> [!NOTE]
 > Cross-entropy giữa phân phối xác suất thực tế $t = (t_1, ..., t_C)$ và phân phối xác suất dự đoán $p = (p_1, ..., p_C)$ được định nghĩa là:
 > $CE(p,t) = -\sum_{i=1}^{C}{t_i\log p_i} > 0$
 
