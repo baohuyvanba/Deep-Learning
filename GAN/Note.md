@@ -1,16 +1,18 @@
-- **Nội dung**:
-	- Sự khác biệt giữa mô hình tạo sinh (Generative) và mô hình phân biệt (Discriminative).
-	- Xác định các vấn đề mà GAN có thể giải quyết.
-	- Tìm hiểu vai trò của trình Generator và trình phân biệt trong hệ thống GAN.
-	- Tìm hiểu ưu và nhược điểm của các hàm tổn thất GAN phổ biến.
-	- Xác định các giải pháp có thể có cho các vấn đề thường gặp khi huấn luyện GAN.
-	- Ứng dụng
+> [!NOTE] Nội dung
+> - Sự khác biệt giữa mô hình tạo sinh (Generative) và mô hình phân biệt (Discriminative).
+> - Xác định các vấn đề mà GAN có thể giải quyết.
+> - Tìm hiểu vai trò của trình Generator và trình phân biệt trong hệ thống GAN.
+> - Tìm hiểu ưu và nhược điểm của các hàm tổn thất GAN phổ biến.
+> - Xác định các giải pháp có thể có cho các vấn đề thường gặp khi huấn luyện GAN.
+> - Ứng dụng
+
 # I. Introduction
 - GAN thuộc nhóm Generative Model, là **mô hình tạo sinh**: tạo các thực thể dữ liệu mới giống với dữ liệu huấn luyện.
 - GAN có thể tạo hình ảnh trông giống như ảnh chụp khuôn mặt người, dù các khuôn mặt không thuộc về bất kỳ người nào.
 - Ví dụ với kết quả đầu ra của styleGAN:
 
-![styleGAN](https://github.com/baohuyvanba/Deep-Learning/blob/main/GAN/attachments/styleGAN.png)
+![styleGAN](./attachments/styleGAN.png)
+
 - Mạng đối nghịch tạo sinh - GAN là viết tắt cho Generative Adversarial Networks.
 	- Generative giống như ở trên và Adversarial là đối nghịch.
 	- GAN được cấu thành từ 2 mạng gọi là Generator và Discriminator, luôn đối nghịch đầu với nhau trong quá trình huấn luyện mạng GAN.
@@ -74,7 +76,8 @@
 		- Ví dụ số 0 ở hàng đầu tiên có rất nhiều biến dạng nhưng vẫn là số 0.
 	- Input của Generator là noise để khi ta thay đổi noise ngẫu nhiên thì Generator có thể sinh ra một biến dạng khác của chữ viết tay.
 	- Noise cho Generator thường được sinh ra từ normal distribution hoặc uniform distribution.
-![MNIST](https://github.com/baohuyvanba/Deep-Learning/blob/main/GAN/attachments/MNIST.png)
+
+![MNIST](./attachments/MNIST.png)
 
 - Khi đó, theo yêu cầu của bài toán, ta xác định mô hình mạng GAN với kiến trúc:
 ```python
@@ -98,7 +101,7 @@ class Generator(nn.Module):
         return img
 ```
 ### 3.2 Huấn luyện
-![GLoss](https://github.com/baohuyvanba/Deep-Learning/blob/main/GAN/attachments/GLoss.png)
+![GLoss](./attachments/GLoss.png)
 - Quá trình huấn luyện Generator đòi hỏi mức độ tích hợp chặt chẽ hơn giữa Generator và Discriminator:
 	- Dữ liệu đầu vào ngẫu nhiên, thường là nhiễu sinh ra từ normal distributation; 
 	- Generator, biến đổi dữ liệu đầu vào ngẫu nhiên thành một thực thể dữ liệu;
@@ -110,7 +113,7 @@ class Generator(nn.Module):
 	- Cơ bản nhất, GAN lấy nhiễu ngẫu nhiên làm đầu vào $\to$ đầu ra có ý nghĩa. Việc này cho phép GAN tạo và lấy mẫu từ nhiều vị trí trong phân phối mẫu mục tiêu.
 	- Các thử nghiệm cho thấy rằng *việc phân phối nhiễu không quan trọng lắm*, vì vậy, chúng ta có thể chọn một giá trị dễ lấy mẫu, chẳng hạn như phân phối đồng nhất. Để thuận tiện, không gian lấy mẫu nhiễu thường có kích thước nhỏ hơn kích thước của không gian đầu ra.
 - **Sử dụng Discriminator để huấn luyện Generator**:
-	- *Huấn luyện mạng nơron*: thay đổi trọng số của mạng để giảm lỗi / mất mát đầu ra.
+	- Huấn luyện mạng nơron: thay đổi trọng số của mạng để giảm lỗi / mất mát đầu ra.
 	- Tuy nhiên, trong GAN, $\mathcal{G}$ *không được kết nối trực tiếp với mất mát* mà ta đang cố gắng tác động.
 	- Đầu ra của $\mathcal{G}$ sẽ đưa vào $\mathcal{D}$ từ đó sẽ tạo ra đầu ra mà chúng ta đang cố gắng tác động.
 - Ta phải *đưa phần mạng bổ sung* này vào **quá trình lan truyền ngược**.
@@ -206,8 +209,10 @@ class Discriminator(nn.Module):
 - Công thức bắt nguồn từ giá trị Cross-Entropy từ phân phối dữ liệu thực và dữ liệu giả được tạo ra.
 
 > [!NOTE] Cross-Entropy
-> Cross-entropy giữa **phân phối xác suất thực tế** $t = (t_1, ..., t_C)$ và **phân phối xác suất dự đoán** $p = (p_1, ..., p_C)$ được định nghĩa là: $$CE(p,t) = -\sum_{i=1}^{C}{t_i\log p_i} > 0$$
-> Chi tiết: [[../../Machine Learning Fundamentals/Session 9. Logistic Regression#1. Xây dựng hàm mất mát|Session 9. Logistic Regression]]
+> Cross-entropy giữa phân phối xác suất thực tế $t = (t_1, ..., t_C)$ và phân phối xác suất dự đoán $p = (p_1, ..., p_C)$ được định nghĩa là:
+> $CE(p,t) = -\sum_{i=1}^{C}{t_i\log p_i} > 0$
+
+
 ### 5.2 Modified Minimax Loss
 - Như được đề cập trong bài viết, việc huấn luyện có thể mắc kẹt ở giai đoạn đầu khi mà công việc của $\mathcal{D}$ rất đơn giản.
 - Do đó, ta được đề xuất việc tối đa hóa giá trị $\textcolor{red}{\mathcal{D}}(\textcolor{green}{\mathcal{G}}(z))$.
@@ -236,11 +241,11 @@ class Discriminator(nn.Module):
 # Tham khảo
 ```bibtex
 @article{goodfellow2014generative,
-  title={Generative adversarial nets},
-  author={Goodfellow, Ian and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
-  journal={Advances in neural information processing systems},
-  volume={27},
-  year={2014}
+	title   = {Generative adversarial nets},
+	author  = {Goodfellow, Ian and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
+	journal = {Advances in neural information processing systems},
+	volume  = {27},
+	year    = {2014}
 }
 ```
 - https://developers.google.com/machine-learning/gan
