@@ -1,3 +1,33 @@
+- [Tại sao lại là ResNet?](#i-why-resnet)
+  - [Vấn đề suy giảm hiệu suất trong mạng học sâu](#1-vấn-đề-suy-giảm-hiệu-suất-trong-mạng-học-sâu)
+  - [Vanishing Gradient và tính ổn định số học](#2-vấn-đề-vanishing-gradient-và-tính-ổn-định-số-học)
+  - [Hạn chế của mạng Nơ-ron sâu và Giải pháp](#3-hạn-chế-của-mạng-nơ-ron-sâu-và-giải-pháp)
+- [Nguyên lý ResNet](#ii-nguyên-lí-resnet)
+  - [Lớp hàm số. Hàm số lồng nhau (Nested function classes)](#1-lớp-hàm-số-hàm-số-lồng-nhau-nested-function-classes)
+  - [Khối phần dư (Residual Block): Học hàm phần dư thay vì hàm mục tiêu](#2-khối-phần-dư-residual-block-học-hàm-phần-dư-thay-vì-hàm-mục-tiêu)
+  - [Kết nối Tắt (Shortcut Connection) và Ánh xạ đồng nhất (Identity Mapping): Đường tín hiệu và Gradient hiệu quả](#3-kết-nối-tắt-shortcut-connection-và-ánh-xạ-đồng-nhất-identity-mapping-đường-tín-hiệu-và-gradient-hiệu-quả)
+- [ResNet: Toán học](#iii-resnet-toán-học)
+  - [Khối phần dư (Residual Block)](#1-khối-phần-dư-residual-block)
+  - [Không gian hàm và tối ưu hóa](#2-không-gian-hàm-và-tối-ưu-hóa)
+  - [Ảnh hưởng của Kết nối Tắt đến Gradient và Huấn luyện](#3-ảnh-hưởng-của-kết-nối-tắt-đến-gradient-và-huấn-luyện)
+- [Kiến trúc và hoạt động](#iv-kiến-trúc-và-hoạt-động)
+  - [Kiến trúc tổng quan](#1-kiến-trúc-tổng-quan)
+  - [Cấu trúc khối phần dư: Cơ bản và Bottleneck](#2-cấu-trúc-khối-phần-dư-cơ-bản-và-bottleneck)
+  - [Các biến thể ResNet](#3-các-biến-thể-resnet)
+  - [Truyền xuôi và Truyền ngược](#4-truyền-xuôi-và-truyền-ngược)
+- [Cài đặt và Huấn luyện](#v-cài-đặt-và-huấn-luyện)
+  - [Xây dựng Khối phần dư và Module ResNet](#1-xây-dựng-khối-phần-dư-và-module-resnet)
+    - [Lớp phần dư - Residual Block](#11-lớp-phần-dư-residual-block)
+      - [Giá trị `bias` trong hàm nn.Conv2d](#111-giá-trị-bias-trong-hàm-nnconv2d)
+      - [Batch Normalization](#112-batch-normalization)
+    - [ResNet Module](#12-resnet-module)
+      - [Basic Block](#121-basic-block)
+      - [Bottleneck Block](#122-bottleneck-block)
+  - [Kiến trúc ResNet hoàn chỉnh](#2-kiến-trúc-resnet-hoàn-chỉnh)
+- [Tham khảo](#tham-khảo)
+
+
+
 # I. Why Resnet?
 - Nhằm giải quyết những thách thức trong việc huấn luyện các mạng nơ-ron sâu: Vanishing Gradient.
 - Vấn đề này trở nên ngày càng quan trọng khi các nhà nghiên cứu và kỹ sư muốn xây dựng các mô hình phức tạp hơn để cải thiện hiệu suất trong các tác vụ thị giác máy tính và nhiều lĩnh vực khác.
@@ -176,6 +206,49 @@ class ResidualNetwork(nn.Module):
 - **Lớp downsample cho projection shortcut** (tích chập $1\times 1$) nếu cần: `self.downsample = downsample`
 	- Tùy chọn, có thể là lớp Sequential chứa Conv2d và BatchNorm2d để thực hiện projection shortcut.
 	- Được sử dụng khi `stride > 1` hoặc khi số kênh đầu vào và đầu ra khác nhau, *để kích thước identity và hàm phần dư khớp nhau khi cộng*.
+#### 1.1.1 Giá trị `bias` trong hàm nn.Conv2d
+- Trong lớp tích chập 2 chiều (nn.Conv2d) của PyTorch (cũng như trong các thư viện deep learning khác), *tham số bias là một vector các giá trị* có thể học được, được *cộng vào output* của phép tích chập.
+- Về cơ bản, `bias` là một *tham số bổ sung* cho mỗi kernel tích chập, giúp *tăng thêm độ linh hoạt* cho mô hình.
+- **Vai trò**:
+	- Dịch chuyển Hàm kích hoạt - tăng khả năng biểu diễn:
+		- Cho phép dịch chuyển `output` của phép tích chập trước khi đưa vào hàm kích hoạt.
+		- Không có `bias`, thì chỉ có phép biến đổi tuyến tính (tích chập và tổng) và hàm kích hoạt phi tuyến luôn được áp dụng quanh điểm gốc (như ReLU luôn chặn giá trị âm về $0$).
+		- `Bias` dịch chuyển "điểm gốc" này, cho phép hàm kích hoạt hoạt động trên các vùng không gian khác nhau của `input` từ đó tăng khả năng biểu diễn của mạng.
+	- Tăng tính linh hoạt:
+		- Tăng thêm một chiều tự do, cho phép học các hàm số phức tạp hơn.
+		- Nó tương tự như hệ số tung độ gốc (intercept) trong phương trình đường thẳng $y=mx+c$, trong đó $c$ là bias.
+		- Nghĩa là cho phép đường thẳng/siêu phẳng dịch chuyển, mở rộng phạm vi biểu diễn.
+- Giá trị `bias = False` trong kiến trúc ResNet:
+	- Do có lớp `BatchNorm2d` (Batch Normalization) đã bao gồm các tham số $\text{beta}$ (shift) và $\text{gamma}$ (scale) tương tự chức năng và thậm chí mạnh mẽ hơn trong kiểm soát phân phối.
+	- Việc có cả 2 có thể gây chậm hội tụ, phức tạp mô hình.
+#### 1.1.2 Batch Normalization
+- `BatchNorm2d`: là *lớp chuẩn hóa activations* của một lớp trong từng mini-batch dữ liệu.
+- **Mục đích**:
+	- Tăng tốc huấn luyện: cho phép sử dụng $\text{learning rate}$ cao hơn, và khi `activations` được chuẩn hóa, gradient trở nên ổn định và mô hình học nhanh hơn.
+	- Cải thiện độ ổn định:
+		- Giảm hiện tượng **internal covariate shift** (sự thay đổi phân phối `activations` giữa các lớp trong khi huấn luyện).
+		- Chuẩn hóa `activations`, các lớp sau nhận được input có phân phối ổn định hơn, làm cho quá trình huấn luyện ổn định hơn và ít bị ảnh hưởng bởi sự thay đổi phân phối input.
+	- Hiệu Ứng Chính Quy Hóa (Regularization Effect):
+		- Batch Normalization có một hiệu ứng chính quy hóa nhẹ, giảm overfitting và cải thiện khả năng tổng quát hóa.
+
+- **Hoạt động**: bao gồm các bước
+	1. **Tính toán Thống kê theo Mini-batch**: với mỗi batch, tính giá trị $\text{mean}$ (trung bình) $\mu_B$ và $\text{standard deviation}$ (độ lệch chuẩn) $\sigma_B$ của `activation` trên từng kênh (feature channel).
+		- Input BatchNorm: $x$ có kích thước $(N, C, H, W)$: $N$ - batch size, $C$ - số kênh, $H$ - chiều cao, $W$ - chiều rộng. 
+		- $\text{mean}$ và $\text{standard deviation}$ được tính cho mỗi kênh $c$ (từ 1 đến $C$) trên tất cả các mẫu trong batch và trên tất cả các vị trí không gian $(H, W)$.
+		 - Công thức:
+			 - $\begin{cases} \mu_B^{(c)} &= \dfrac{1}{N \times H \times W} \displaystyle\sum_{i=1}^{N} \sum_{j=1}^{H} \sum_{k=1}^{W} x_{ijk}^{(c)} \\[6pt] (\sigma_B^{(c)})^2 &= \dfrac{1}{N \times H \times W} \displaystyle\sum_{i=1}^{N} \sum_{j=1}^{H} \sum_{k=1}^{W} (x_{ijk}^{(c)} - \mu_B^{(c)})^2 \end{cases}$
+		- Trong đó, $x_{ijk}^{(c)}$ là giá trị activation tại vị trí $(i, j, k)$ trên kênh $c$ trong batch $B$.
+	2. **Chuẩn hóa (Normalize) Activation**: sử dụng hai giá trên
+		- $\hat{x}_{ijk}^{(c)} = \dfrac{x_{ijk}^{(c)} - \mu_B^{(c)}}{\sqrt{(\sigma_B^{(c)})^2 + \varepsilon}}$
+        - Trong đó, $\varepsilon$ là một số nhỏ (ví dụ, $10^{-5}$) để tránh chia cho $0$.
+	3. **Scale và Shift (Tỷ Lệ và Dịch Chuyển)**:
+		- Sau chuẩn hóa, *phép biến đổi scale và shift* áp dụng sử dụng hai tham số có thể học được: *gamma* $\gamma$ và *beta* $\beta$.
+		- Các tham số này được học trong quá trình huấn luyện và cho phép mạng học lại phân phối `activations` tối ưu cho từng lớp.
+			- $y_{ijk}^{(c)} = \gamma^{(c)} \hat{x}_{ijk}^{(c)} + \beta^{(c)}$
+		- Trong đó, $\gamma^{(c)}$ và $\beta^{(c)}$ là tham số scale và shift cho kênh $c$, được khởi tạo lần lượt bằng 1 và 0.
+	4. **Trong Quá Trình Đánh Giá (Evaluation/Inference)**:
+		- Trong quá trình đánh giá hoặc inference, $\text{mean}$ và $\text{standard deviation}$ không được tính toán theo batch nữa, mà sử dụng **running mean** và **running variance** được tích lũy trong quá trình huấn luyện trên toàn bộ tập huấn luyện.
+		- Điều này đảm bảo rằng output của BatchNorm là deterministic (xác định) và không phụ thuộc vào kích thước batch trong quá trình đánh giá. 
 ### 1.2 ResNet Module
 1. **ResNet Module** - Basic Block (tương tự Residual Block nhưng cụ thể hóa hơn)
 ```python
