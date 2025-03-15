@@ -79,8 +79,7 @@
     - Hệ số hằng số xác định tỷ lệ phân bổ tài nguyên cho độ sâu, độ rộng và độ phân giải, được xác định thông qua grid search trên một mô hình nhỏ ban đầu (EfficientNet-B0)
     - Các hệ số này phải đảm bảo rằng khi tăng $\varphi$ lên $1$ đơn vị, tổng FLOPS của mô hình sẽ tăng lên khoảng $2$ lần, do đó phải thỏa mãn điều kiện:
 
-    <p align="center"><img src="./attachments/alpha_beta_gamma.png" alt="Alpha Beta Gamma" width="150"/></p>
-    <!---$$\begin{cases} \alpha \times \beta^2 \times \gamma^2 &\approx 2 \\[2pt] \alpha,\beta,\gamma &\ge 1 \end{cases}$$--->
+    <p align="center"><img src="./attachments/eq.alpha_beta_gamma.png" alt="$$\begin{cases} \alpha \times \beta^2 \times \gamma^2 &\approx 2 \\[2pt] \alpha,\beta,\gamma &\ge 1 \end{cases}$$" width="150"/></p>
 
     - Ngược lại, khi muốn tăng $2^\varphi$ lần sức mạng tính toán (FLOPS) thì chỉ cần tăng các chiều tương ứng với hệ số $\varphi$.
 
@@ -92,24 +91,28 @@
 ## 3. Bài toán Tối ưu hóa
 ### 3.1 Biễu diễn mạng
 - Một lớp $i$ của một mạng tích chập có thể xác định dưới dạng: 
-  $$Y_i = \mathcal{F}_i(X_i)$$
+  
+  <p align="center"><img src="./attachments/eq.conv_layer_i.png" alt="$$Y_i = \mathcal{F}_i(X_i)$$" width="100"/></p>
+
   trong đó:
   - $\mathcal{F}_i$ khối tính toán thứ $i$;
   - $Y_i$ là tensor đầu ra;
   - $X_i$ là tensor đầu vào với kích thước $\langle H_i, W_i, C_i \rangle$.
 - Một mạng tích chập $\mathcal{N}$ có thể biểu diễn bằng chuỗi $k$ lớp:
   
-  $$\mathcal{N} = \mathcal{F}_k \hspace{2pt}\odot\hspace{2pt} ... \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_2 \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_1(X_1) = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i(X_{\langle H_i, W_i, C_i \rangle})$$
+  <p align="center"><img src="./attachments/eq.conv.png" alt="$$\mathcal{N} = \mathcal{F}_k \hspace{2pt}\odot\hspace{2pt} ... \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_2 \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_1(X_1) = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i(X_{\langle H_i, W_i, C_i \rangle})$$" width="350"/></p>
 
 - Trên thức tế, các lớp ConvNet thường chia thành nhiều giai đoạn, mỗi giai đoạn gồm nhiều lớp có cùng kiến trúc, do đó ta có thể ghi thành:
   
-  $$\mathcal{N} = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i^{L_i}(X_{\langle H_i, W_i, C_i \rangle})$$
+  <p align="center"><img src="./attachments/eq.convl.png" alt="$$\mathcal{N} = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i^{L_i}(X_{\langle H_i, W_i, C_i \rangle})$$" width="170"/></p>
 
   với $\mathcal{F}_{i}^{L_i}$ biểu diễn lớp $\mathcal{F}_i$ được lặp lại $L_i$ lần ở giai đoạn $i$.
 ### 3.2 Bài toán mở rộng CNN
 - Không giống như các thiết kế ConvNet thông thường chủ yếu tập trung vào việc tìm kiến ​​trúc lớp $F_i$ tốt nhất, việc mở rộng mô hình cố gắng mở rộng chiều dài mạng ($L_i$), chiều rộng ($C_i$) và/hoặc độ phân giải ($H_i, W_i$) mà không thay đổi $F_i$ được xác định trước trong mạng cơ sở.
 - Bài toán Mở rộng CNN được công thức hóa dưới dạng bài toán tối ưu hóa sau:
-  $$\begin{matrix} \displaystyle\max_{d, w, r} & Accuracy(\mathcal{N}(d, w, r)) \\[4pt] \text{s.t.} & \begin{matrix} \mathcal{N}(d,w,r) & = & \displaystyle\bigodot_{i=1..s}\hat{\mathcal{F}}_{i}^{d\cdot\hat{L}_i}{\left(X_{\langle r\cdot\hat{H}_i,\hspace{4pt} r\cdot\hat{W}_i,\hspace{4pt} w\cdot\hat{C}_i\rangle}\right)} \\ \text{Memory}(\mathcal{N}) & \le & \text{target\_memory} \\ \text{FLOPS}(\mathcal{N}) & \le & \text{target\_flops} \end{matrix} \end{matrix}$$
+
+  <p align="center"><img src="./attachments/eq.cnn_scale.png" alt="$$\begin{matrix} \displaystyle\max_{d, w, r} & Accuracy(\mathcal{N}(d, w, r)) \\[4pt] \text{s.t.} & \begin{matrix} \mathcal{N}(d,w,r) & = & \displaystyle\bigodot_{i=1..s}\hat{\mathcal{F}}_{i}^{d\cdot\hat{L}_i}{\left(X_{\langle r\cdot\hat{H}_i,\hspace{4pt} r\cdot\hat{W}_i,\hspace{4pt} w\cdot\hat{C}_i\rangle}\right)} \\ \text{Memory}(\mathcal{N}) & \le & \text{target\_memory} \\ \text{FLOPS}(\mathcal{N}) & \le & \text{target\_flops} \end{matrix} \end{matrix}$$" width="350"/></p>
+  
 - Trong đó:
   - $\mathcal{N}(d, w, r)$: mô hình CNN được mở rộng với các *hệ số coefficient* $d, w, r$.
   - $\mathcal{F}_i, L_i, H_i, W_i, C_i$: các tham số kiến trúc cơ bản của mô hình (xác định trước từ mô hình cơ sở EfficientNet-B0).
@@ -177,7 +180,7 @@
         - Nhân trọng số học được với từng kênh của Feature map ban đầu.
         - Mục đích là tăng cường các kênh quan trọng và giảm độ quan trọng của các kênh ít quan trọng hơn, giúp mạng tập trung vào các đặc trưng hữu ích nhất.
 
-| Giai đoạn | Operator      | Độ phân giải | Số kênh | Số lớp |
+<!-- | Giai đoạn | Operator      | Độ phân giải | Số kênh | Số lớp |
 | --------- | ------------- | ------------ | ------- | ------ |
 | 1         | Conv3x3       | 224x224      | 32      | 1      |
 | **2**     | MBConv1, k3x3 | 112x112      | 16      | 1      |
@@ -186,7 +189,79 @@
 | **5**     | MBConv6, k3x3 | 28x28        | 80      | 3      |
 | **6**     | MBConv6, k5x5 | 14x14        | 112     | 3      |
 | **7**     | MBConv6, k5x5 | 14x14        | 192     | 4      |
-| **8**     | MBConv6, k3x3 | 7x7          | 320     | 1      |
+| **8**     | MBConv6, k3x3 | 7x7          | 320     | 1      | -->
+<div align="center">
+  <table>
+    <thead>
+      <tr>
+        <th>Giai đoạn</th>
+        <th>Operator</th>
+        <th>Độ phân giải</th>
+        <th>Số kênh</th>
+        <th>Số lớp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Conv3x3</td>
+        <td>224x224</td>
+        <td>32</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>MBConv1, k3x3</td>
+        <td>112x112</td>
+        <td>16</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>MBConv6, k3x3</td>
+        <td>112x112</td>
+        <td>24</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>MBConv6, k5x5</td>
+        <td>56x56</td>
+        <td>40</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>MBConv6, k3x3</td>
+        <td>28x28</td>
+        <td>80</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>MBConv6, k5x5</td>
+        <td>14x14</td>
+        <td>112</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td><strong>7</strong></td>
+        <td>MBConv6, k5x5</td>
+        <td>14x14</td>
+        <td>192</td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td><strong>8</strong></td>
+        <td>MBConv6, k3x3</td>
+        <td>7x7</td>
+        <td>320</td>
+        <td>1</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 ### 2.3 Head
 - Phần cuối của mạng, **thực hiện phân loại**.
 - **Cấu hình**:
