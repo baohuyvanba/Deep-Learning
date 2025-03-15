@@ -118,7 +118,7 @@
   - $\mathcal{F}_i, L_i, H_i, W_i, C_i$: các tham số kiến trúc cơ bản của mô hình (xác định trước từ mô hình cơ sở EfficientNet-B0).
   - $\text{Memory}(\mathcal{N})$: lượng bộ nhớ cần thiết để lưu trữ mô hình.
   - $\text{FLOPS}(\mathcal{N})$: số phép tính toán cần thiết để thực hiện forward pass trên mô hình $\mathcal{N}$.
-  - $\text{target\_memory}, \text{target\_flops}$: giới hạn về bộ nhớ và FLOPS cho mô hình.
+  - `target_memory`, `target_flops`: giới hạn về bộ nhớ và FLOPS cho mô hình.
 - Bài toán tối ưu này thể hiện rõ ràng mục tiêu của Compound Scaling: tìm ra các hệ số $d, w, r$ tối ưu để đạt được độ chính xác cao nhất trong giới hạn tài nguyên cho phép.
 # III. Kiến trúc EfficientNet
 ## 1. Neural Architecture Search (NAS) cho EfficientNet
@@ -180,16 +180,6 @@
         - Nhân trọng số học được với từng kênh của Feature map ban đầu.
         - Mục đích là tăng cường các kênh quan trọng và giảm độ quan trọng của các kênh ít quan trọng hơn, giúp mạng tập trung vào các đặc trưng hữu ích nhất.
 
-<!-- | Giai đoạn | Operator      | Độ phân giải | Số kênh | Số lớp |
-| --------- | ------------- | ------------ | ------- | ------ |
-| 1         | Conv3x3       | 224x224      | 32      | 1      |
-| **2**     | MBConv1, k3x3 | 112x112      | 16      | 1      |
-| **3**     | MBConv6, k3x3 | 112x112      | 24      | 2      |
-| **4**     | MBConv6, k5x5 | 56x56        | 40      | 2      |
-| **5**     | MBConv6, k3x3 | 28x28        | 80      | 3      |
-| **6**     | MBConv6, k5x5 | 14x14        | 112     | 3      |
-| **7**     | MBConv6, k5x5 | 14x14        | 192     | 4      |
-| **8**     | MBConv6, k3x3 | 7x7          | 320     | 1      | -->
 <div align="center">
   <table>
     <thead>
@@ -279,7 +269,6 @@
   - Tạo đầu ra là xác suất phân loại.
 ## 3. Scaling EfficientNet: B0 - B7
 - Từ mô hình cơ sở EfficientNet-B0, áp dụng phương pháp Compound Scaling để tạo ra biến thể các mô hình EfficientNet với kích thước và hiệu suất khác nhau, từ EfficientNet-B1 đến EfficientNet-B7
-
 - **Quy trình Scaling**:
   1. **Xác định $\alpha, \beta, \gamma$ cho EfficientNet-B0**:
     - Cố định $\varphi = 1$, thực hiện grid search để tìm ra các giá trị $\alpha, \beta, \gamma$ tối ưu sao cho $\alpha \times \beta^2 \times \gamma^2 \approx 2$.
