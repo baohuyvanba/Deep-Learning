@@ -78,7 +78,9 @@
   - $\alpha, \beta, \gamma$:
     - Hệ số hằng số xác định tỷ lệ phân bổ tài nguyên cho độ sâu, độ rộng và độ phân giải, được xác định thông qua grid search trên một mô hình nhỏ ban đầu (EfficientNet-B0)
     - Các hệ số này phải đảm bảo rằng khi tăng $\varphi$ lên $1$ đơn vị, tổng FLOPS của mô hình sẽ tăng lên khoảng $2$ lần, do đó phải thỏa mãn điều kiện:
-    $$\begin{cases} \alpha \times \beta^2 \times \gamma^2 &\approx 2 \\[2pt] \alpha,\beta,\gamma &\ge 1 \end{cases}$$ 
+    
+    $$\begin{cases} \alpha \times \beta^2 \times \gamma^2 &\approx 2 \\[2pt] \alpha,\beta,\gamma &\ge 1 \end{cases}$$
+
     - Ngược lại, khi muốn tăng $2^\varphi$ lần sức mạng tính toán (FLOPS) thì chỉ cần tăng các chiều tương ứng với hệ số $\varphi$.
 
 - **Ý nghĩa trực quan**:
@@ -95,9 +97,13 @@
   - $Y_i$ là tensor đầu ra;
   - $X_i$ là tensor đầu vào với kích thước $\langle H_i, W_i, C_i \rangle$.
 - Một mạng tích chập $\mathcal{N}$ có thể biểu diễn bằng chuỗi $k$ lớp:
+  
   $$\mathcal{N} = \mathcal{F}_k \hspace{2pt}\odot\hspace{2pt} ... \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_2 \hspace{2pt}\odot\hspace{2pt} \mathcal{F}_1(X_1) = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i(X_{\langle H_i, W_i, C_i \rangle})$$
+
 - Trên thức tế, các lớp ConvNet thường chia thành nhiều giai đoạn, mỗi giai đoạn gồm nhiều lớp có cùng kiến trúc, do đó ta có thể ghi thành:
+  
   $$\mathcal{N} = \displaystyle\bigodot_{i=1..k}\mathcal{F}_i^{L_i}(X_{\langle H_i, W_i, C_i \rangle})$$
+  
   với $\mathcal{F}_{i}^{L_i}$ biểu diễn lớp $\mathcal{F}_i$ được lặp lại $L_i$ lần ở giai đoạn $i$.
 ### 3.2 Bài toán mở rộng CNN
 - Không giống như các thiết kế ConvNet thông thường chủ yếu tập trung vào việc tìm kiến ​​trúc lớp $F_i$ tốt nhất, việc mở rộng mô hình cố gắng mở rộng chiều dài mạng ($L_i$), chiều rộng ($C_i$) và/hoặc độ phân giải ($H_i, W_i$) mà không thay đổi $F_i$ được xác định trước trong mạng cơ sở.
