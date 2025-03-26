@@ -17,5 +17,7 @@ This repository contains implementations of various Deep Learning models.
 - [ ] Reinforcement Learning
 - [x] Langchain
 - [ ] Agentic AI Pattern:
-  - [x] Reflection
-  - [x] Tool Use 
+  - [x] Reflection;
+  - [x] Tool Use;
+  - [ ] Planning;
+  - [ ] Multi Agents;
