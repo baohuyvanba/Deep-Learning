@@ -2,6 +2,10 @@
 
 This repository contains implementations of various Deep Learning models.
 
+## Theory
+- [x] Acivation Functions
+- [ ] Backpropagation
+
 ## Implemented Tasks and Models
 
 - [ ] Recurrent Neural Networks (RNNs)
