@@ -4,7 +4,7 @@ This repository contains implementations of various Deep Learning models.
 
 ## Theory
 - [x] Acivation Functions
-- [ ] Backpropagation
+- [x] Backpropagation
 
 ## Implemented Tasks and Models
 
