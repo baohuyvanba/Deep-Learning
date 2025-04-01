@@ -3,7 +3,6 @@
 - Backpropagation, hay Lan truyền ngược (Backward Propagation of Errors - Lan truyền ngược của lỗi), là một thuật toán nền tảng và quan trọng bậc nhất trong lĩnh vực học máy và đặc biệt là học sâu (Deep Learning).
 	- Là phương pháp tính toán đạo hàm ngược (Reverse of Differentiation) được áp dụng trong Mạng Neuron.
 	- Nó giúp tính toán các đạo hàm cần thiết và từ đó tối ưu hóa các tham số của mô hình.
-
 - Ý tưởng được đề xuất năm 1974 nhưng đến tận 1986 mới trở nên phổ biến và trở thành một phương pháp quan trọng trong việc huấn luyện các mạng Neural nhân tạo.
 
 ## 2. Mục tiêu cốt lõi
