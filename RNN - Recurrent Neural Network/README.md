@@ -282,7 +282,7 @@ Tại mỗi bước thời gian $t$ trong chuỗi, một đơn vị RNN cơ bả
 			- Sau đó truyền tiếp về $a^{<t>}$.
 			- Chuỗi phụ thuộc: $a^{<t>} \to a^{<t+1>} \to \cdots \to \mathcal{L}$.
 	- Từ hai thành phần trên, kết hợp đệ quy, ta có công thức gradient tổng (tổng gradient theo hai chuỗi phụ thuộc):
-      $$\begin{matrix} \delta^{<t>} &= &\left(\dfrac{\partial \mathcal{L}}{\partial \hat{y}^{<t>}}\cdot \dfrac{\partial \hat{y}^{<t>}}{\partial a^{<t>}}\right) &\textcolor{red}{+} &\left(\dfrac{\partial \mathcal{L}}{\partial a^{<t>}}\cdot \dfrac{\partial a^{<t>}}{\partial a^{<t>}}\right) \\[4pt] & &(\text{thành phần 1}) & &(\text{thành phần 2}) \end{matrix}$$
+   	  $$\begin{matrix} \delta^{<t>} &= &\left(\dfrac{\partial \mathcal{L}}{\partial \hat{y}^{<t>}}\cdot \dfrac{\partial \hat{y}^{<t>}}{\partial a^{<t>}}\right) &\textcolor{red}{+} &\left(\dfrac{\partial \mathcal{L}}{\partial a^{<t>}}\cdot \dfrac{\partial a^{<t>}}{\partial a^{<t>}}\right) \\[4pt] & &(\text{thành phần 1}) & &(\text{thành phần 2}) \end{matrix}$$
 	- Với đạo hàm $\dfrac{\partial \hat{y}^{<t>}}{\partial a^{<t>}}$, và biến trung gian (pre-activation) $z^{<t>} = W_{ya}\cdot a^{<t>} + b_y$: 
 		- Chuỗi phụ thuộc: $a^{<t>} \to z^{<t>} \to \hat{y}^{<t>}$;
 		- Áp dụng chain-rule, ta có:
