@@ -260,7 +260,7 @@ Tại mỗi bước thời gian $t$ trong chuỗi, một đơn vị RNN cơ bả
 - **Tính Gradient cho Lớp đầu ra** $W_{ya}, b_y$:
 	- Các tham số này chỉ ảnh hưởng đến đầu ra $y^{<t>}$ tại bước thời gian $t$;
 	- Áp dụng chain-rule tại bước $t$ để tính Gradient của hàm mất mát $\mathcal{L}^{<t>}$:
-      $$\dfrac{\partial \mathcal{L^{<t>}}}{\partial W_{ya}} = \dfrac{\partial \mathcal{L}^{<t>}}{\partial \hat{y}^{<t>}} \cdot \dfrac{\partial \hat{y}^{<t>}}{\partial z^{<t>}} \cdot \dfrac{\partial z^{<t>}}{\partial W_{ya}}$$
+   	  $$\dfrac{\partial \mathcal{L^{<t>}}}{\partial W_{ya}} = \dfrac{\partial \mathcal{L}^{<t>}}{\partial \hat{y}^{<t>}} \cdot \dfrac{\partial \hat{y}^{<t>}}{\partial z^{<t>}} \cdot \dfrac{\partial z^{<t>}}{\partial W_{ya}}$$
 	  trong đó:
 		- $\dfrac{\partial \mathcal{L}^{<t>}}{\partial \hat{y}^{<t>}}$: đạo hàm của hàm mất mát tại bước $t$;
 		- $\dfrac{\partial \hat{y}^{<t>}}{\partial z^{<t>}} = g'\left(z^{<t>}\right)$: đạo hàm của hàm kích hoạt;
